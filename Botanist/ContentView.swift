@@ -11,10 +11,21 @@ import SwiftUI
 
 struct ContentView: View {
     @State var age: CGFloat = 0
+    @State var treeType: String = "Curly"
     
     var body: some View {
         VStack {
-            CurlyBoy(age: age)
+            TreeGroup {
+                if treeType == "Curly" {
+                    CurlyBoy(age: age)
+                } else if treeType == "Wavy" {
+                    WavyBoy(age: age)
+                } else if treeType == "Left" {
+                    LeftBoy(age: age)
+                } else {
+                    EmptyTree()
+                }
+            }
             .stroke(lineWidth: 1)
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
@@ -23,6 +34,12 @@ struct ContentView: View {
                 EmptyView()
             }.labelsHidden().padding()
             Text("Age: \(age, specifier: "%.1f")")
+            
+            Picker(selection: $treeType, label: EmptyView()) {
+                Text("Curly").tag("Curly")
+                Text("Wavy").tag("Wavy")
+                Text("Left").tag("Left")
+            }.labelsHidden()
         }
     }
 }
