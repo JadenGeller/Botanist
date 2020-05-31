@@ -12,13 +12,6 @@ import SwiftUI
 protocol Tree {
     var path: Path { get }
 }
-//extension Tree {
-//    var body: TurtlePath {
-//        TurtlePath { path in
-//            draw(in: &path)
-//        }
-//    }
-//}
 
 protocol Growth {
     func length(for age: CGFloat) -> CGFloat
@@ -39,28 +32,6 @@ struct ExponentialGrowth: Growth {
         scale * (pow(rate, age / timeConstant) - 1)
     }
 }
-
-//struct TimeShifted<GrowthRate: Growth>: Growth {
-//    var growth: GrowthRate
-//    var growth: GrowthRate
-//
-//    func length(for age: CGFloat) -> CGFloat {
-//        <#code#>
-//    }
-//}
-//extension Growth {
-//    func ageShift(_ ageDelta: CGFloat) ->
-//}
-
-//extension GrowthRate {
-//    static func linear(rate: CGFloat) -> GrowthRate {
-//        LinearGrowth(rate: rate)
-//    }
-//
-//    static func exponential(rate: CGFloat, scale: CGFloat = 1, timeConstant: CGFloat = 1) -> GrowthRate {
-//        ExponentialGrowth(rate: rate, scale: scale, timeConstant: timeConstant)
-//    }
-//}
 
 struct Stem: Tree {
     let length: CGFloat
@@ -118,7 +89,6 @@ struct TreeBuilder {
     }
 }
 
-
 struct Branch: Tree {
     let subtrees: [Tree]
     init(@TreeBuilder subtrees: () -> [Tree]) {
@@ -152,26 +122,6 @@ extension Tree {
         Rotate(subtree: self, angle: angle)
     }
 }
-
-//extension Stem where Bud == EmptyTree {
-//    init(length: CGFloat) {
-//        self.length = length
-//        self.bud = EmptyTree()
-//    }
-//}
-
-//struct Branch: Tree {
-//    let length: CGFloat
-//
-//    init(length: CGFloat) {
-//        self.length = length
-//    }
-//
-//    func draw(in path: inout TurtlePath) {
-//        path.draw(length: length)
-//    }
-//}
-
 
 struct CurlyBoy: Tree {
     var age: CGFloat
@@ -277,24 +227,6 @@ struct ContentView: View {
             }.labelsHidden().padding()
             Text("Age: \(age, specifier: "%.1f")")
         }
-    
-//        (0..<7).reduce(TurtlePath) { path, _ in
-//
-//        }
-//        TurtlePath { path in
-//            path.draw(length: 100)
-//            path.turn(.degrees(20))
-//            path.draw(length: 100)
-//            path.turn(.degrees(20))
-//            path.draw(length: 100)
-//            path.turn(.degrees(20))
-//            path.draw(length: 100)
-//            path.turn(.degrees(20))
-//            path.draw(length: 100)
-//        }
-//        (0..<7).reduce(Path()) { path, _ in
-//            path.currentPoint
-//        }.stroke(lineWidth: 5)
     }
 }
 
