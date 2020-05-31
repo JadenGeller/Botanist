@@ -14,7 +14,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            LeftBoy(age: age)
+            CurlyBoy(age: age)
             .stroke(lineWidth: 1)
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
