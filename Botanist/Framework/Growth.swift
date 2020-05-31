@@ -29,8 +29,16 @@ struct ExponentialGrowth: Growth {
 }
 
 extension Stem {
-    init(age: CGFloat, growth: Growth, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
+    init(age: CGFloat, growth: Growth, @TreeBuilder subtree: () -> Subtree) {
         self.length = growth.length(for: age)
         self.subtree = subtree()
+    }
+}
+
+extension Stem where Subtree == EmptyTree {
+    init(age: CGFloat, growth: Growth) {
+        self.init(age: age, growth: growth) {
+            EmptyTree()
+        }
     }
 }

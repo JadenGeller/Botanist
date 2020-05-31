@@ -10,8 +10,8 @@ import SwiftUI
 
 struct LeftBoy: Tree {
     var age: CGFloat
-
-    var path: Path {
+    
+    var trunk: some Tree {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.3, scale: 10)) {
             Branch {
                 if age > 1 {
@@ -29,6 +29,6 @@ struct LeftBoy: Tree {
                     }
                 }
             }
-        }.path
+        }
     }
 }

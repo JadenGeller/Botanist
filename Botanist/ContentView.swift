@@ -14,9 +14,8 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            WavyBoy(age: age).path
+            LeftBoy(age: age)
             .stroke(lineWidth: 1)
-            .offset(x: 150)
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
             

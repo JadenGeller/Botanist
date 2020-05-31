@@ -8,28 +8,37 @@
 
 import SwiftUI
 
-struct CurlyBoy: Tree {
+struct CurlyBoy<Subtree: Tree>: Tree {
     var age: CGFloat
-    var subtree: Tree
-    init(age: CGFloat, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
+    var subtree: Subtree
+    
+    init(age: CGFloat, @TreeBuilder subtree: () -> Subtree) {
         self.age = age
         self.subtree = subtree()
     }
     
-    var path: Path {
+    var trunk: some Tree {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.1)) {
             Branch {
                 Stem(age: age, growth: ExponentialGrowth(rate: 1.1)) {
                     if age > 3 {
-                        CurlyBoy(age: age - 3)
+                        CurlyBoy<EmptyTree>(age: age - 3)
                             .rotate(.degrees(25.7))
                     }
                 }
                 if age > 2.5 {
-                    CurlyBoy(age: age - 2.5)
+                    CurlyBoy<EmptyTree>(age: age - 2.5)
                         .rotate(.degrees(-25.7))
                 }
             }
-        }.path
+        }
+    }
+}
+
+extension CurlyBoy where Subtree == EmptyTree {
+    init(age: CGFloat) {
+        self.init(age: age) {
+            EmptyTree()
+        }
     }
 }
