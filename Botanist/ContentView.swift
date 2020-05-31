@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 
 protocol Tree {
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle)
+    var path: Path { get }
 }
 //extension Tree {
 //    var body: TurtlePath {
@@ -64,31 +64,30 @@ struct ExponentialGrowth: Growth {
 
 struct Stem: Tree {
     let length: CGFloat
-    let tree: Tree
+    let subtree: Tree
     
-    init(length: CGFloat, @TreeBuilder tree: () -> Tree = { EmptyTree() }) {
+    init(length: CGFloat, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
         self.length = length
-        self.tree = tree()
+        self.subtree = subtree()
     }
         
-    init(age: CGFloat, growth: Growth, @TreeBuilder tree: () -> Tree = { EmptyTree() }) {
+    init(age: CGFloat, growth: Growth, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
         self.length = growth.length(for: age)
-        self.tree = tree()
+        self.subtree = subtree()
     }
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        let endPosition = CGPoint(
-            x: position.x + length * CGFloat(cos(heading.radians)),
-            y: position.y + length * CGFloat(sin(heading.radians))
-        )
-        path.addLine(to: endPosition)
-        tree.draw(in: &path, from: endPosition, with: heading)
+    var path: Path {
+        Path { path in
+            path.move(to: .zero)
+            path.addLine(to: CGPoint(x: 0, y: length))
+            path.addPath(subtree.path, transform: .init(translationX: 0, y: length))
+        }
     }
 }
 
 struct EmptyTree: Tree {
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        
+    var path: Path {
+        Path()
     }
 }
 
@@ -129,10 +128,11 @@ struct Branch: Tree {
         self.subtrees = [subtree()]
     }
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        for subtree in subtrees {
-            path.move(to: position)
-            subtree.draw(in: &path, from: position, with: heading)
+    var path: Path {
+        Path { path in
+            for subtree in subtrees {
+                path.addPath(subtree.path)
+            }
         }
     }
 }
@@ -141,8 +141,10 @@ struct Rotate: Tree {
     let subtree: Tree
     let angle: Angle
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        subtree.draw(in: &path, from: position, with: heading + angle)
+    var path: Path {
+        Path { path in
+            path.addPath(subtree.path, transform: CGAffineTransform(rotationAngle: CGFloat(angle.radians)))
+        }
     }
 }
 extension Tree {
@@ -179,7 +181,7 @@ struct CurlyBoy: Tree {
         self.subtree = subtree()
     }
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+    var path: Path {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.1)) {
             Branch {
                 Stem(age: age, growth: ExponentialGrowth(rate: 1.1)) {
@@ -193,7 +195,7 @@ struct CurlyBoy: Tree {
                         .rotate(.degrees(-25.7))
                 }
             }
-        }.draw(in: &path, from: position, with: heading)
+        }.path
     }
 }
 
@@ -205,9 +207,9 @@ struct WavyBoy: Tree {
         self.subtree = subtree()
     }
 
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+    var path: Path {
         if age > 2 {
-            WavyBoy(age: age / 2) {
+            return WavyBoy(age: age / 2) {
                 WavyBoy(age: age / 2) {
                     Branch {
                         WavyBoy(age: age - 2) {
@@ -225,11 +227,11 @@ struct WavyBoy: Tree {
                         subtree
                     }
                 }
-            }.draw(in: &path, from: position, with: heading)
+            }.path
         } else {
-            Stem(age: age, growth: LinearGrowth(rate: 5)) {
+            return Stem(age: age, growth: LinearGrowth(rate: 5)) {
                 subtree
-            }.draw(in: &path, from: position, with: heading)
+            }.path
         }
     }
 }
@@ -237,7 +239,7 @@ struct WavyBoy: Tree {
 struct LeftBoy: Tree {
     var age: CGFloat
 
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+    var path: Path {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.3, scale: 10)) {
             Branch {
                 if age > 1 {
@@ -255,7 +257,7 @@ struct LeftBoy: Tree {
                     }
                 }
             }
-        }.draw(in: &path, from: position, with: heading)
+        }.path
     }
 }
 
@@ -264,11 +266,8 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Path { path in
-                WavyBoy(age: age).draw(in: &path, from: .zero, with: .zero)
-            }
+            WavyBoy(age: age).path
             .stroke(lineWidth: 1)
-            .rotationEffect(.degrees(-90))
             .offset(x: 150)
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
