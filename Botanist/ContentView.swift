@@ -73,6 +73,19 @@ struct ExponentialGrowth: Growth {
         scale * (pow(rate, age / timeConstant) - 1)
     }
 }
+
+//struct TimeShifted<GrowthRate: Growth>: Growth {
+//    var growth: GrowthRate
+//    var growth: GrowthRate
+//
+//    func length(for age: CGFloat) -> CGFloat {
+//        <#code#>
+//    }
+//}
+//extension Growth {
+//    func ageShift(_ ageDelta: CGFloat) ->
+//}
+
 //extension GrowthRate {
 //    static func linear(rate: CGFloat) -> GrowthRate {
 //        LinearGrowth(rate: rate)
@@ -216,31 +229,42 @@ struct CurlyBoy: Tree {
     }
 }
 
-//struct WavyBoy: Tree {
-//    var age: CGFloat
-//    var subtree: Tree
-//    init(age: CGFloat, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
-//        self.age = age
-//        self.subtree = subtree()
-//    }
-//
-//    func draw(in path: inout TurtlePath) {
-//        Stem(length: 5 * (pow(1.1, age * 3) - 1)) {
-//            Branch {
-//                Stem(length: 5 * (pow(1.1, age * 3) - 1)) {
-//                    if age > 2/3 {
-//                        CurlyBoy(age: age - 2/3)
-//                            .rotate(.degrees(25.7))
-//                    }
-//                }
-//                if age > 1/3 {
-//                    CurlyBoy(age: age - 1/3)
-//                        .rotate(.degrees(-25.7))
-//                }
-//            }
-//        }.draw(in: &path)
-//    }
-//}
+struct WavyBoy: Tree {
+    var age: CGFloat
+    var subtree: Tree
+    init(age: CGFloat, @TreeBuilder subtree: () -> Tree = { EmptyTree() }) {
+        self.age = age
+        self.subtree = subtree()
+    }
+
+    func draw(in path: inout TurtlePath) {
+        if age > 2 {
+            WavyBoy(age: age / 2) {
+                WavyBoy(age: age / 2) {
+                    Branch {
+                        WavyBoy(age: age - 2) {
+                            WavyBoy(age: age - 2) {
+                                WavyBoy(age: age - 2)
+                                    .rotate(.degrees(-22.5))
+                            }.rotate(.degrees(-22.5))
+                        }.rotate(.degrees(45))
+                        WavyBoy(age: age - 2) {
+                            WavyBoy(age: age - 2) {
+                                WavyBoy(age: age - 2)
+                                    .rotate(.degrees(22.5))
+                            }.rotate(.degrees(22.5))
+                        }.rotate(.degrees(-22.5))
+                        subtree
+                    }
+                }
+            }.draw(in: &path)
+        } else {
+            Stem(age: age, growth: LinearGrowth(rate: 5)) {
+                subtree
+            }.draw(in: &path)
+        }
+    }
+}
 
 struct LeftBoy: Tree {
     var age: CGFloat
@@ -273,14 +297,14 @@ struct ContentView: View {
     var body: some View {
         VStack {
             TurtlePath { path in
-                LeftBoy(age: age).draw(in: &path)
+                WavyBoy(age: age).draw(in: &path)
             }
             .rotationEffect(.degrees(-90))
             .offset(x: 150)
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
             
-            Slider(value: $age, in: 0...8) {
+            Slider(value: $age, in: 0...20) {
                 EmptyView()
             }.labelsHidden().padding()
             Text("Age: \(age, specifier: "%.1f")")
