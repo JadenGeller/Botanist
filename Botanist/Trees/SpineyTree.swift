@@ -1,5 +1,5 @@
 //
-//  SpineyBoy.swift
+//  SpineyTree.swift
 //  Botanist
 //
 //  Created by Jaden Geller on 5/31/20.
@@ -9,13 +9,13 @@
 import SwiftUI
 
 // FIXME: Proxy for type inference
-func _SpineyBoy<Subtree: Tree>(age: CGFloat, @TreeBuilder subtree: () -> Subtree) -> SpineyBoy<Subtree> {
-    SpineyBoy(age: age) {
+func _SpineyTree<Subtree: Tree>(age: CGFloat, @TreeBuilder subtree: () -> Subtree) -> SpineyTree<Subtree> {
+    SpineyTree(age: age) {
         subtree()
     }
 }
 
-struct SpineyBoy<Subtree: Tree>: Tree {
+struct SpineyTree<Subtree: Tree>: Tree {
     var age: CGFloat
     var subtree: Subtree
     init(age: CGFloat, @TreeBuilder subtree: () -> Subtree) {
@@ -26,18 +26,18 @@ struct SpineyBoy<Subtree: Tree>: Tree {
     var trunk: some Tree {
         TreeGroup {
             if age > 4 {
-                _SpineyBoy(age: age / 2) {
-                    _SpineyBoy(age: age / 2) {
+                _SpineyTree(age: age / 2) {
+                    _SpineyTree(age: age / 2) {
                         Branch {
-                            _SpineyBoy(age: age - 4) {
-                                _SpineyBoy(age: age - 4) {
-                                    SpineyBoy<EmptyTree>(age: age - 4)
+                            _SpineyTree(age: age - 4) {
+                                _SpineyTree(age: age - 4) {
+                                    SpineyTree<EmptyTree>(age: age - 4)
                                         .rotate(.degrees(-22.5))
                                 }.rotate(.degrees(-22.5))
                             }.rotate(.degrees(45))
-                            _SpineyBoy(age: age - 4) {
-                                _SpineyBoy(age: age - 4) {
-                                    SpineyBoy<EmptyTree>(age: age - 4)
+                            _SpineyTree(age: age - 4) {
+                                _SpineyTree(age: age - 4) {
+                                    SpineyTree<EmptyTree>(age: age - 4)
                                         .rotate(.degrees(22.5))
                                 }.rotate(.degrees(22.5))
                             }.rotate(.degrees(-22.5))
@@ -54,7 +54,7 @@ struct SpineyBoy<Subtree: Tree>: Tree {
     }
 }
 
-extension SpineyBoy where Subtree == EmptyTree {
+extension SpineyTree where Subtree == EmptyTree {
     init(age: CGFloat) {
         self.init(age: age) {
             EmptyTree()

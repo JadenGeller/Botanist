@@ -17,11 +17,11 @@ struct ContentView: View {
         VStack {
             TreeGroup {
                 if treeType == "Curly" {
-                    CurlyBoy(age: age)
+                    CurlyTree(age: age)
                 } else if treeType == "Spiney" {
-                    SpineyBoy(age: age)
+                    SpineyTree(age: age)
                 } else if treeType == "Reachy" {
-                    ReachyBoy(age: age)
+                    ReachyTree(age: age)
                 } else {
                     EmptyTree()
                 }

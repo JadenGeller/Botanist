@@ -16,9 +16,9 @@
 		D733E50724843AAB003CEDC8 /* Growth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E50624843AAB003CEDC8 /* Growth.swift */; };
 		D733E50A24843AFA003CEDC8 /* Primitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E50924843AFA003CEDC8 /* Primitives.swift */; };
 		D733E50C24843B40003CEDC8 /* TreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E50B24843B40003CEDC8 /* TreeBuilder.swift */; };
-		D733E50E24843B78003CEDC8 /* CurlyBoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E50D24843B78003CEDC8 /* CurlyBoy.swift */; };
-		D733E51124843BA1003CEDC8 /* SpineyBoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E51024843BA1003CEDC8 /* SpineyBoy.swift */; };
-		D733E51324843BAE003CEDC8 /* LeftBoy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E51224843BAE003CEDC8 /* LeftBoy.swift */; };
+		D733E50E24843B78003CEDC8 /* CurlyTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E50D24843B78003CEDC8 /* CurlyTree.swift */; };
+		D733E51124843BA1003CEDC8 /* SpineyTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E51024843BA1003CEDC8 /* SpineyTree.swift */; };
+		D733E51324843BAE003CEDC8 /* ReachyTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E51224843BAE003CEDC8 /* ReachyTree.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,9 +33,9 @@
 		D733E50624843AAB003CEDC8 /* Growth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Growth.swift; sourceTree = "<group>"; };
 		D733E50924843AFA003CEDC8 /* Primitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitives.swift; sourceTree = "<group>"; };
 		D733E50B24843B40003CEDC8 /* TreeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeBuilder.swift; sourceTree = "<group>"; };
-		D733E50D24843B78003CEDC8 /* CurlyBoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurlyBoy.swift; sourceTree = "<group>"; };
-		D733E51024843BA1003CEDC8 /* SpineyBoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineyBoy.swift; sourceTree = "<group>"; };
-		D733E51224843BAE003CEDC8 /* LeftBoy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftBoy.swift; sourceTree = "<group>"; };
+		D733E50D24843B78003CEDC8 /* CurlyTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurlyTree.swift; sourceTree = "<group>"; };
+		D733E51024843BA1003CEDC8 /* SpineyTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpineyTree.swift; sourceTree = "<group>"; };
+		D733E51224843BAE003CEDC8 /* ReachyTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachyTree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,9 +102,9 @@
 		D733E50F24843B82003CEDC8 /* Trees */ = {
 			isa = PBXGroup;
 			children = (
-				D733E50D24843B78003CEDC8 /* CurlyBoy.swift */,
-				D733E51024843BA1003CEDC8 /* SpineyBoy.swift */,
-				D733E51224843BAE003CEDC8 /* LeftBoy.swift */,
+				D733E50D24843B78003CEDC8 /* CurlyTree.swift */,
+				D733E51024843BA1003CEDC8 /* SpineyTree.swift */,
+				D733E51224843BAE003CEDC8 /* ReachyTree.swift */,
 			);
 			path = Trees;
 			sourceTree = "<group>";
@@ -181,12 +181,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				D733E50724843AAB003CEDC8 /* Growth.swift in Sources */,
-				D733E51124843BA1003CEDC8 /* SpineyBoy.swift in Sources */,
+				D733E51124843BA1003CEDC8 /* SpineyTree.swift in Sources */,
 				D733E50C24843B40003CEDC8 /* TreeBuilder.swift in Sources */,
-				D733E51324843BAE003CEDC8 /* LeftBoy.swift in Sources */,
+				D733E51324843BAE003CEDC8 /* ReachyTree.swift in Sources */,
 				D733E4F124833EB6003CEDC8 /* AppDelegate.swift in Sources */,
 				D733E50A24843AFA003CEDC8 /* Primitives.swift in Sources */,
-				D733E50E24843B78003CEDC8 /* CurlyBoy.swift in Sources */,
+				D733E50E24843B78003CEDC8 /* CurlyTree.swift in Sources */,
 				D733E4F324833EB6003CEDC8 /* SceneDelegate.swift in Sources */,
 				D733E4F524833EB6003CEDC8 /* ContentView.swift in Sources */,
 			);

@@ -1,5 +1,5 @@
 //
-//  CurlyBoy.swift
+//  CurlyTree.swift
 //  Botanist
 //
 //  Created by Jaden Geller on 5/31/20.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CurlyBoy: Tree {
+struct CurlyTree: Tree {
     var age: CGFloat
     
     var trunk: some Tree {
@@ -16,12 +16,12 @@ struct CurlyBoy: Tree {
             Branch {
                 Stem(age: age, growth: ExponentialGrowth(rate: 1.1, scale: 8)) {
                     if age > 2.5 {
-                        CurlyBoy(age: age - 2.5)
+                        CurlyTree(age: age - 2.5)
                             .rotate(.degrees(25.7))
                     }
                 }
                 if age > 1.5 {
-                    CurlyBoy(age: age - 1.5)
+                    CurlyTree(age: age - 1.5)
                         .rotate(.degrees(-25.7))
                 }
             }
