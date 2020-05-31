@@ -18,10 +18,10 @@ struct ContentView: View {
             TreeGroup {
                 if treeType == "Curly" {
                     CurlyBoy(age: age)
-                } else if treeType == "Wavy" {
-                    WavyBoy(age: age)
-                } else if treeType == "Left" {
-                    LeftBoy(age: age)
+                } else if treeType == "Spiney" {
+                    SpineyBoy(age: age)
+                } else if treeType == "Reachy" {
+                    ReachyBoy(age: age)
                 } else {
                     EmptyTree()
                 }
@@ -37,8 +37,8 @@ struct ContentView: View {
             
             Picker(selection: $treeType, label: EmptyView()) {
                 Text("Curly").tag("Curly")
-                Text("Wavy").tag("Wavy")
-                Text("Left").tag("Left")
+                Text("Spiney").tag("Spiney")
+                Text("Reachy").tag("Reachy")
             }.labelsHidden()
         }
     }
