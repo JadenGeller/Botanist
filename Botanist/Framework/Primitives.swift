@@ -120,16 +120,9 @@ struct Branch2<T0: Tree, T1: Tree>: Tree {
         forest.1.draw(in: &path, from: position, with: heading)
     }
 }
-func Branch<T0: Tree, T1: Tree>(@TreeBuilder _ branch: () -> Branch2<T0, T1>) -> some Tree {
-    branch()
-}
 
 struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
     var forest: (T0, T1, T2)
-    
-//    init(@TreeBuilder _ branch: () -> Branch3) {
-//        self = branch()
-//    }
     
     typealias Trunk = Never
     
@@ -139,16 +132,9 @@ struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
         forest.2.draw(in: &path, from: position, with: heading)
     }
 }
-func Branch<T0: Tree, T1: Tree, T2: Tree>(@TreeBuilder _ branch: () -> Branch3<T0, T1, T2>) -> some Tree {
-    branch()
-}
 
 struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
     var forest: (T0, T1, T2, T3)
-    
-//    init(@TreeBuilder _ branch: () -> Branch4) {
-//        self = branch()
-//    }
     
     typealias Trunk = Never
     
@@ -158,9 +144,6 @@ struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
         forest.2.draw(in: &path, from: position, with: heading)
         forest.3.draw(in: &path, from: position, with: heading)
     }
-}
-func Branch<T0: Tree, T1: Tree, T2: Tree, T3: Tree>(@TreeBuilder _ branch: () -> Branch4<T0, T1, T2, T3>) -> some Tree {
-    branch()
 }
 
 enum ConditionalTree<TrueTree: Tree, FalseTree: Tree>: Tree {

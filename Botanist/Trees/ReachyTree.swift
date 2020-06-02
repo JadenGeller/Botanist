@@ -13,20 +13,16 @@ struct ReachyTree: Tree {
     
     var trunk: some Tree {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.2, scale: 2)) {
-            Branch {
+            if age > 3 {
+                ReachyTree(age: age - 3)
+                    .rotate(.degrees(-20))
+            }
+            Stem(age: age, growth: ExponentialGrowth(rate: 1.2, scale: 2)) {
                 if age > 3 {
                     ReachyTree(age: age - 3)
                         .rotate(.degrees(-20))
-                }
-                Stem(age: age, growth: ExponentialGrowth(rate: 1.2, scale: 2)) {
-                    if age > 3 {
-                        Branch {
-                            ReachyTree(age: age - 3)
-                                .rotate(.degrees(-20))
-                            ReachyTree(age: age - 3)
-                                .rotate(.degrees(20))
-                        }
-                    }
+                    ReachyTree(age: age - 3)
+                        .rotate(.degrees(20))
                 }
             }
         }

@@ -28,23 +28,21 @@ struct SpineyTree<Subtree: Tree>: Tree {
             if age > 4 {
                 _SpineyTree(age: age / 2) {
                     _SpineyTree(age: age / 2) {
-                        Branch {
+                        _SpineyTree(age: age - 4) {
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
-                                    _SpineyTree(age: age - 4) {
-                                        Leaf()
-                                    }.rotate(.degrees(-22.5))
+                                    Leaf()
                                 }.rotate(.degrees(-22.5))
-                            }.rotate(.degrees(45))
+                            }.rotate(.degrees(-22.5))
+                        }.rotate(.degrees(45))
+                        _SpineyTree(age: age - 4) {
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
-                                    _SpineyTree(age: age - 4) {
-                                        Leaf()
-                                    }.rotate(.degrees(22.5))
+                                    Leaf()
                                 }.rotate(.degrees(22.5))
-                            }.rotate(.degrees(-22.5))
-                            subtree
-                        }
+                            }.rotate(.degrees(22.5))
+                        }.rotate(.degrees(-22.5))
+                        subtree
                     }
                 }
             } else {
