@@ -34,11 +34,3 @@ extension Stem {
         self.subtree = subtree()
     }
 }
-
-extension Stem where Subtree == EmptyTree {
-    init(age: CGFloat, growth: Growth) {
-        self.init(age: age, growth: growth) {
-            EmptyTree()
-        }
-    }
-}

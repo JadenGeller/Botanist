@@ -31,14 +31,16 @@ struct SpineyTree<Subtree: Tree>: Tree {
                         Branch {
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
-                                    SpineyTree<EmptyTree>(age: age - 4)
-                                        .rotate(.degrees(-22.5))
+                                    _SpineyTree(age: age - 4) {
+                                        Leaf()
+                                    }.rotate(.degrees(-22.5))
                                 }.rotate(.degrees(-22.5))
                             }.rotate(.degrees(45))
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
-                                    SpineyTree<EmptyTree>(age: age - 4)
-                                        .rotate(.degrees(22.5))
+                                    _SpineyTree(age: age - 4) {
+                                        Leaf()
+                                    }.rotate(.degrees(22.5))
                                 }.rotate(.degrees(22.5))
                             }.rotate(.degrees(-22.5))
                             subtree
@@ -50,14 +52,6 @@ struct SpineyTree<Subtree: Tree>: Tree {
                     subtree
                 }
             }
-        }
-    }
-}
-
-extension SpineyTree where Subtree == EmptyTree {
-    init(age: CGFloat) {
-        self.init(age: age) {
-            EmptyTree()
         }
     }
 }

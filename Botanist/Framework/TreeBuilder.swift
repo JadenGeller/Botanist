@@ -8,8 +8,8 @@
 
 @_functionBuilder
 struct TreeBuilder {
-    static func buildBlock() -> EmptyTree {
-        return EmptyTree()
+    static func buildBlock() -> Leaf {
+        return Leaf()
     }
     
     public static func buildBlock<T: Tree>(_ tree: T) -> T {
@@ -28,11 +28,11 @@ struct TreeBuilder {
         .init(forest: (t0, t1, t2, t3))
     }
     
-    public static func buildIf<T: Tree>(_ tree: T?) -> ConditionalTree<T, EmptyTree> {
+    public static func buildIf<T: Tree>(_ tree: T?) -> OptionalTree<T> {
         if let tree = tree {
-            return .trueTree(tree)
+            return .someTree(tree)
         } else {
-            return .falseTree(EmptyTree())
+            return .none
         }
     }
     

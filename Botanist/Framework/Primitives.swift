@@ -11,10 +11,20 @@ import SwiftUI
 protocol Tree: Shape {
     associatedtype Trunk: Tree
     var trunk: Trunk { get }
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle)
+}
+extension Tree {
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        trunk.draw(in: &path, from: position, with: heading)
+    }
 }
 extension Tree {
     public func path(in rect: CGRect) -> Path {
-        trunk.path(in: rect)
+        Path { path in
+            let startingPoint = CGPoint(x: rect.midX, y: rect.maxY)
+            path.move(to: startingPoint)
+            draw(in: &path, from: startingPoint, with: .degrees(-90))
+        }
     }
 }
 
@@ -28,17 +38,18 @@ extension Tree where Trunk == Never {
     }
 }
 
-struct EmptyTree: Tree {
+struct Leaf: Tree {
     typealias Trunk = Never
-
-    func path(in rect: CGRect) -> Path {
-        Path()
+    
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        path.addLine(to: position)
     }
 }
 
 struct Stem<Subtree: Tree>: Tree {
     var length: CGFloat
     var width: CGFloat = 0
+    var angle: Angle = .zero
     var subtree: Subtree
     
     init(length: CGFloat, @TreeBuilder subtree: () -> Subtree) {
@@ -48,14 +59,20 @@ struct Stem<Subtree: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func path(in rect: CGRect) -> Path {
-        Path { path in
-            path.move(to: CGPoint(x: rect.midX - width / 2, y: rect.maxY))
-            path.addLine(to: CGPoint(x: rect.midX - width / 2, y: rect.maxY - length))
-            path.addLine(to: CGPoint(x: rect.midX + width / 2, y: rect.maxY - length))
-            path.addLine(to: CGPoint(x: rect.midX + width / 2, y: rect.maxY))
-            path.addPath(subtree.path(in: rect), transform: .init(translationX: 0, y: -length))
-        }
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        let orthogonal = heading + .degrees(90)
+        path.addLine(to: CGPoint(
+            x: position.x - width * cos(CGFloat(orthogonal.radians)),
+            y: position.y - width * sin(CGFloat(orthogonal.radians))
+        ))
+        subtree.draw(in: &path, from: CGPoint(
+            x: position.x + length * cos(CGFloat(heading.radians)),
+            y: position.y + length * sin(CGFloat(heading.radians))
+        ), with: heading)
+        path.addLine(to: CGPoint(
+            x: position.x + width * cos(CGFloat(orthogonal.radians)),
+            y: position.y + width * sin(CGFloat(orthogonal.radians))
+        ))
     }
 }
 extension Stem {
@@ -66,10 +83,10 @@ extension Stem {
     }
 }
 
-extension Stem where Subtree == EmptyTree {
+extension Stem where Subtree == Leaf {
     init(length: CGFloat) {
         self.init(length: length) {
-            EmptyTree()
+            Leaf()
         }
     }
 
@@ -81,8 +98,8 @@ private struct Rotate<Subtree: Tree>: Tree {
 
     typealias Trunk = Never
 
-    func path(in rect: CGRect) -> Path {
-        subtree.rotation(angle, anchor: .bottom).path(in: rect)
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        subtree.draw(in: &path, from: position, with: heading + angle)
     }
 }
 
@@ -98,11 +115,9 @@ struct Branch2<T0: Tree, T1: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func path(in rect: CGRect) -> Path {
-        Path { path in
-            path.addPath(forest.0.path(in: rect))
-            path.addPath(forest.1.path(in: rect))
-        }
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        forest.0.draw(in: &path, from: position, with: heading)
+        forest.1.draw(in: &path, from: position, with: heading)
     }
 }
 func Branch<T0: Tree, T1: Tree>(@TreeBuilder _ branch: () -> Branch2<T0, T1>) -> some Tree {
@@ -118,12 +133,10 @@ struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func path(in rect: CGRect) -> Path {
-        Path { path in
-            path.addPath(forest.0.path(in: rect))
-            path.addPath(forest.1.path(in: rect))
-            path.addPath(forest.2.path(in: rect))
-        }
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        forest.0.draw(in: &path, from: position, with: heading)
+        forest.1.draw(in: &path, from: position, with: heading)
+        forest.2.draw(in: &path, from: position, with: heading)
     }
 }
 func Branch<T0: Tree, T1: Tree, T2: Tree>(@TreeBuilder _ branch: () -> Branch3<T0, T1, T2>) -> some Tree {
@@ -139,13 +152,11 @@ struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func path(in rect: CGRect) -> Path {
-        Path { path in
-            path.addPath(forest.0.path(in: rect))
-            path.addPath(forest.1.path(in: rect))
-            path.addPath(forest.2.path(in: rect))
-            path.addPath(forest.3.path(in: rect))
-        }
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        forest.0.draw(in: &path, from: position, with: heading)
+        forest.1.draw(in: &path, from: position, with: heading)
+        forest.2.draw(in: &path, from: position, with: heading)
+        forest.3.draw(in: &path, from: position, with: heading)
     }
 }
 func Branch<T0: Tree, T1: Tree, T2: Tree, T3: Tree>(@TreeBuilder _ branch: () -> Branch4<T0, T1, T2, T3>) -> some Tree {
@@ -158,12 +169,28 @@ enum ConditionalTree<TrueTree: Tree, FalseTree: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func path(in rect: CGRect) -> Path {
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
         switch self {
         case .trueTree(let tree):
-            return tree.path(in: rect)
+            tree.draw(in: &path, from: position, with: heading)
         case .falseTree(let tree):
-            return tree.path(in: rect)
+            tree.draw(in: &path, from: position, with: heading)
+        }
+    }
+}
+
+enum OptionalTree<SomeTree: Tree>: Tree {
+    case someTree(SomeTree)
+    case none
+    
+    typealias Trunk = Never
+    
+    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+        switch self {
+        case .someTree(let tree):
+            tree.draw(in: &path, from: position, with: heading)
+        case .none:
+            break
         }
     }
 }

@@ -19,11 +19,13 @@ struct ContentView: View {
                 if treeType == "Curly" {
                     CurlyTree(age: age)
                 } else if treeType == "Spiney" {
-                    SpineyTree(age: age)
+                    SpineyTree(age: age) {
+                        Leaf()
+                    }
                 } else if treeType == "Reachy" {
                     ReachyTree(age: age)
                 } else {
-                    EmptyTree()
+                    Leaf()
                 }
             }
             .fill()
