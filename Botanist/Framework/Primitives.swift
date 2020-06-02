@@ -37,8 +37,9 @@ struct EmptyTree: Tree {
 }
 
 struct Stem<Subtree: Tree>: Tree {
-    let length: CGFloat
-    let subtree: Subtree
+    var length: CGFloat
+    var width: CGFloat = 0
+    var subtree: Subtree
     
     init(length: CGFloat, @TreeBuilder subtree: () -> Subtree) {
         self.length = length
@@ -49,12 +50,22 @@ struct Stem<Subtree: Tree>: Tree {
     
     func path(in rect: CGRect) -> Path {
         Path { path in
-            path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
-            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY - length))
+            path.move(to: CGPoint(x: rect.midX - width / 2, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.midX - width / 2, y: rect.maxY - length))
+            path.addLine(to: CGPoint(x: rect.midX + width / 2, y: rect.maxY - length))
+            path.addLine(to: CGPoint(x: rect.midX + width / 2, y: rect.maxY))
             path.addPath(subtree.path(in: rect), transform: .init(translationX: 0, y: -length))
         }
     }
 }
+extension Stem {
+    func width(_ width: CGFloat) -> Stem {
+        var copy = self
+        copy.width = width
+        return copy
+    }
+}
+
 extension Stem where Subtree == EmptyTree {
     init(length: CGFloat) {
         self.init(length: length) {

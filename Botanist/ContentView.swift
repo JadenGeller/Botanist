@@ -26,7 +26,7 @@ struct ContentView: View {
                     EmptyTree()
                 }
             }
-            .stroke(lineWidth: 1)
+            .fill()
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
             
