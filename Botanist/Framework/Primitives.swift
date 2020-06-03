@@ -119,15 +119,6 @@ struct Stem<Subtree: Tree>: Tree {
     }
 }
 
-extension Stem where Subtree == Leaf {
-    init(length: CGFloat) {
-        self.init(length: length) {
-            Leaf()
-        }
-    }
-
-}
-
 private struct Rotate<Subtree: Tree>: Tree {
     let subtree: Subtree
     let angle: Angle
