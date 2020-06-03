@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D708A2A0248736E600769149 /* WeepyTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D708A29F248736E600769149 /* WeepyTree.swift */; };
 		D733E4F124833EB6003CEDC8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E4F024833EB6003CEDC8 /* AppDelegate.swift */; };
 		D733E4F324833EB6003CEDC8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E4F224833EB6003CEDC8 /* SceneDelegate.swift */; };
 		D733E4F524833EB6003CEDC8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D733E4F424833EB6003CEDC8 /* ContentView.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D708A29F248736E600769149 /* WeepyTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeepyTree.swift; sourceTree = "<group>"; };
 		D733E4ED24833EB6003CEDC8 /* Botanist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Botanist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D733E4F024833EB6003CEDC8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D733E4F224833EB6003CEDC8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				D733E50D24843B78003CEDC8 /* CurlyTree.swift */,
 				D733E51024843BA1003CEDC8 /* SpineyTree.swift */,
 				D733E51224843BAE003CEDC8 /* ReachyTree.swift */,
+				D708A29F248736E600769149 /* WeepyTree.swift */,
 			);
 			path = Trees;
 			sourceTree = "<group>";
@@ -181,6 +184,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D733E50724843AAB003CEDC8 /* Growth.swift in Sources */,
+				D708A2A0248736E600769149 /* WeepyTree.swift in Sources */,
 				D733E51124843BA1003CEDC8 /* SpineyTree.swift in Sources */,
 				D733E50C24843B40003CEDC8 /* TreeBuilder.swift in Sources */,
 				D733E51324843BAE003CEDC8 /* ReachyTree.swift in Sources */,

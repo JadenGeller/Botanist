@@ -119,6 +119,20 @@ struct Stem<Subtree: Tree>: Tree {
     }
 }
 
+struct CrossSectionReader<Subtree: Tree>: Tree {
+    var subtree: (CrossSection) -> Subtree
+    
+    init(@TreeBuilder subtree: @escaping (CrossSection) -> Subtree) {
+        self.subtree = subtree
+    }
+    
+    typealias Shoot = Never
+    
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        subtree(crossSection).draw(in: &path, from: crossSection)
+    }
+}
+
 private struct Rotate<Subtree: Tree>: Tree {
     let subtree: Subtree
     let angle: Angle

@@ -24,6 +24,8 @@ struct ContentView: View {
                     }
                 } else if treeType == "Reachy" {
                     ReachyTree(age: age)
+                } else if treeType == "Weepy" {
+                    WeepyTree(age: age)
                 } else {
                     EmptyView()
                 }
@@ -40,6 +42,7 @@ struct ContentView: View {
                 Text("Curly").tag("Curly")
                 Text("Spiney").tag("Spiney")
                 Text("Reachy").tag("Reachy")
+                Text("Weepy").tag("Weepy")
             }.labelsHidden()
         }
     }
