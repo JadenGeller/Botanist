@@ -18,11 +18,11 @@ struct CurlyTree: Tree {
                     CurlyTree(age: age - 2.5)
                         .rotate(.degrees(25.7))
                 }
-            }.width(ExponentialGrowth(rate: 1.1, scale: 1.3).length(for: age))
+            }.scale(0.7)
             if age > 1.5 {
                 CurlyTree(age: age - 1.5)
                     .rotate(.degrees(-25.7))
             }
-        }.width(ExponentialGrowth(rate: 1.1, scale: 1.3).length(for: age))
+        }.scale(0.7)
     }
 }

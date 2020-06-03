@@ -8,22 +8,72 @@
 
 import SwiftUI
 
+extension Angle {
+    var orthogonal: Angle {
+        self + .degrees(90)
+    }
+}
+
+struct CrossSection {
+    var midpoint: CGPoint
+    var heading: Angle
+    var radius: CGFloat
+    
+    var leftPoint: CGPoint {
+        CGPoint(
+            x: midpoint.x - radius * cos(CGFloat(heading.orthogonal.radians)),
+            y: midpoint.y - radius * sin(CGFloat(heading.orthogonal.radians))
+        )
+    }
+    
+    var rightPoint: CGPoint {
+        CGPoint(
+            x: midpoint.x + radius * cos(CGFloat(heading.orthogonal.radians)),
+            y: midpoint.y + radius * sin(CGFloat(heading.orthogonal.radians))
+        )
+    }
+    
+    func extending(by length: CGFloat) -> CrossSection {
+        CrossSection(
+            midpoint: CGPoint(
+                x: midpoint.x + length * cos(CGFloat(heading.radians)),
+                y: midpoint.y + length * sin(CGFloat(heading.radians))
+            ),
+            heading: heading,
+            radius: radius
+        )
+    }
+    
+    func rotating(by angle: Angle) -> CrossSection {
+        CrossSection(midpoint: midpoint, heading: heading + angle, radius: radius)
+    }
+    
+    func scaling(by multiplier: CGFloat) -> CrossSection {
+        CrossSection(midpoint: midpoint, heading: heading, radius: radius * multiplier)
+    }
+}
+
 protocol Tree: Shape {
     associatedtype Trunk: Tree
     var trunk: Trunk { get }
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle)
+    func draw(in path: inout Path, from crossSection: CrossSection)
 }
 extension Tree {
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        trunk.draw(in: &path, from: position, with: heading)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        trunk.draw(in: &path, from: crossSection)
     }
 }
 extension Tree {
     public func path(in rect: CGRect) -> Path {
         Path { path in
-            let startingPoint = CGPoint(x: rect.midX, y: rect.maxY)
-            path.move(to: startingPoint)
-            draw(in: &path, from: startingPoint, with: .degrees(-90))
+            let crossSection = CrossSection(
+                midpoint: CGPoint(x: rect.midX, y: rect.maxY),
+                heading: .degrees(-90),
+                radius: 5 // FIXME: Don't hardcode
+            )
+            path.move(to: crossSection.leftPoint)
+            draw(in: &path, from: crossSection)
+            path.addLine(to: crossSection.rightPoint)
         }
     }
 }
@@ -41,15 +91,13 @@ extension Tree where Trunk == Never {
 struct Leaf: Tree {
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        path.addLine(to: position)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        path.addLine(to: crossSection.midpoint) // FIXME: Is this even useful?
     }
 }
 
 struct Stem<Subtree: Tree>: Tree {
     var length: CGFloat
-    var width: CGFloat = 0
-    var angle: Angle = .zero
     var subtree: Subtree
     
     init(length: CGFloat, @TreeBuilder subtree: () -> Subtree) {
@@ -59,27 +107,11 @@ struct Stem<Subtree: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        let orthogonal = heading + .degrees(90)
-        path.addLine(to: CGPoint(
-            x: position.x - width * cos(CGFloat(orthogonal.radians)),
-            y: position.y - width * sin(CGFloat(orthogonal.radians))
-        ))
-        subtree.draw(in: &path, from: CGPoint(
-            x: position.x + length * cos(CGFloat(heading.radians)),
-            y: position.y + length * sin(CGFloat(heading.radians))
-        ), with: heading)
-        path.addLine(to: CGPoint(
-            x: position.x + width * cos(CGFloat(orthogonal.radians)),
-            y: position.y + width * sin(CGFloat(orthogonal.radians))
-        ))
-    }
-}
-extension Stem {
-    func width(_ width: CGFloat) -> Stem {
-        var copy = self
-        copy.width = width
-        return copy
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        let crossSection = crossSection.extending(by: length)
+        path.addLine(to: crossSection.leftPoint)
+        subtree.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
     }
 }
 
@@ -98,8 +130,8 @@ private struct Rotate<Subtree: Tree>: Tree {
 
     typealias Trunk = Never
 
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        subtree.draw(in: &path, from: position, with: heading + angle)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        subtree.draw(in: &path, from: crossSection.rotating(by: angle))
     }
 }
 
@@ -110,14 +142,34 @@ extension Tree {
     }
 }
 
+private struct Scale<Subtree: Tree>: Tree {
+    let subtree: Subtree
+    let multiplier: CGFloat
+
+    typealias Trunk = Never
+
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        subtree.draw(in: &path, from: crossSection.scaling(by: multiplier))
+    }
+}
+
+// FIXME
+extension Tree {
+    func scale(_ multiplier: CGFloat) -> some Tree {
+        Scale(subtree: self, multiplier: multiplier)
+    }
+}
+
 struct Branch2<T0: Tree, T1: Tree>: Tree {
     var forest: (T0, T1)
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        forest.0.draw(in: &path, from: position, with: heading)
-        forest.1.draw(in: &path, from: position, with: heading)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        forest.0.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.1.draw(in: &path, from: crossSection)
     }
 }
 
@@ -126,10 +178,14 @@ struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        forest.0.draw(in: &path, from: position, with: heading)
-        forest.1.draw(in: &path, from: position, with: heading)
-        forest.2.draw(in: &path, from: position, with: heading)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        forest.0.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.1.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.2.draw(in: &path, from: crossSection)
     }
 }
 
@@ -138,11 +194,17 @@ struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
-        forest.0.draw(in: &path, from: position, with: heading)
-        forest.1.draw(in: &path, from: position, with: heading)
-        forest.2.draw(in: &path, from: position, with: heading)
-        forest.3.draw(in: &path, from: position, with: heading)
+    func draw(in path: inout Path, from crossSection: CrossSection) {
+        forest.0.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.1.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.2.draw(in: &path, from: crossSection)
+        path.addLine(to: crossSection.rightPoint)
+        path.addLine(to: crossSection.leftPoint)
+        forest.3.draw(in: &path, from: crossSection)
     }
 }
 
@@ -152,12 +214,12 @@ enum ConditionalTree<TrueTree: Tree, FalseTree: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+    func draw(in path: inout Path, from crossSection: CrossSection) {
         switch self {
         case .trueTree(let tree):
-            tree.draw(in: &path, from: position, with: heading)
+            tree.draw(in: &path, from: crossSection)
         case .falseTree(let tree):
-            tree.draw(in: &path, from: position, with: heading)
+            tree.draw(in: &path, from: crossSection)
         }
     }
 }
@@ -168,10 +230,10 @@ enum OptionalTree<SomeTree: Tree>: Tree {
     
     typealias Trunk = Never
     
-    func draw(in path: inout Path, from position: CGPoint, with heading: Angle) {
+    func draw(in path: inout Path, from crossSection: CrossSection) {
         switch self {
         case .someTree(let tree):
-            tree.draw(in: &path, from: position, with: heading)
+            tree.draw(in: &path, from: crossSection)
         case .none:
             break
         }
