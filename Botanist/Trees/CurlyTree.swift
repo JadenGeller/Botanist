@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct CurlyTree: Tree, View {
+    let angle: Angle = .degrees(Double.random(in: 15...40))
     var age: CGFloat
     
     var shoot: some Tree {
@@ -16,12 +17,12 @@ struct CurlyTree: Tree, View {
             Stem(age: age, growth: ExponentialGrowth(rate: 1.1, scale: 8)) {
                 if age > 2.5 {
                     CurlyTree(age: age - 2.5)
-                        .rotate(.degrees(25.7))
+                        .rotate(angle)
                 }
             }
             if age > 1.5 {
                 CurlyTree(age: age - 1.5)
-                    .rotate(.degrees(-25.7))
+                    .rotate(-angle)
             }
         }.scale(0.7)
     }
