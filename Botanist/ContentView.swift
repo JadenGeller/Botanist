@@ -15,7 +15,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            TreeGroup {
+            Group {
                 if treeType == "Curly" {
                     CurlyTree(age: age)
                 } else if treeType == "Spiney" {
@@ -25,10 +25,9 @@ struct ContentView: View {
                 } else if treeType == "Reachy" {
                     ReachyTree(age: age)
                 } else {
-                    Leaf()
+                    EmptyView()
                 }
             }
-            .fill()
             .frame(width: 300, height: 300)
             .background(Color.gray.opacity(0.1))
             

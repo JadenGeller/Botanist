@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct CurlyTree: Tree {
+struct CurlyTree: Tree, View {
     var age: CGFloat
     
     var shoot: some Tree {
@@ -18,11 +18,15 @@ struct CurlyTree: Tree {
                     CurlyTree(age: age - 2.5)
                         .rotate(.degrees(25.7))
                 }
-            }.scale(0.7)
+            }
             if age > 1.5 {
                 CurlyTree(age: age - 1.5)
                     .rotate(.degrees(-25.7))
             }
         }.scale(0.7)
+    }
+    
+    var body: some View {
+        Trunk(diameter: pow(1.2, age) / 3, shoot: shoot)
     }
 }

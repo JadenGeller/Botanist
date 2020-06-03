@@ -53,9 +53,9 @@ struct CrossSection {
     }
 }
 
-protocol Tree: Shape {
+protocol Tree {
     associatedtype Shoot: Tree
-    var shoot: Shoot { get }
+    var shoot: Shoot { get } // FIXME: Is subtree a better name?
     func draw(in path: inout Path, from crossSection: CrossSection)
 }
 extension Tree {
@@ -63,13 +63,17 @@ extension Tree {
         shoot.draw(in: &path, from: crossSection)
     }
 }
-extension Tree {
+
+struct Trunk<Shoot: Tree>: Tree, Shape {
+    var diameter: CGFloat
+    var shoot: Shoot
+
     public func path(in rect: CGRect) -> Path {
         Path { path in
             let crossSection = CrossSection(
                 midpoint: CGPoint(x: rect.midX, y: rect.maxY),
                 heading: .degrees(-90),
-                radius: 5 // FIXME: Don't hardcode
+                radius: diameter / 2
             )
             path.move(to: crossSection.leftPoint)
             draw(in: &path, from: crossSection)

@@ -15,7 +15,7 @@ func _SpineyTree<Subtree: Tree>(age: CGFloat, @TreeBuilder subtree: () -> Subtre
     }
 }
 
-struct SpineyTree<Subtree: Tree>: Tree {
+struct SpineyTree<Subtree: Tree>: Tree, View {
     var age: CGFloat
     var subtree: Subtree
     init(age: CGFloat, @TreeBuilder subtree: () -> Subtree) {
@@ -32,16 +32,16 @@ struct SpineyTree<Subtree: Tree>: Tree {
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
                                     Leaf()
-                                }.rotate(.degrees(-22.5))
-                            }.rotate(.degrees(-22.5))
-                        }.rotate(.degrees(45))
+                                }.rotate(.degrees(-22.5)).scale(0.7)
+                            }.rotate(.degrees(-22.5)).scale(0.7)
+                        }.rotate(.degrees(45)).scale(0.7)
                         _SpineyTree(age: age - 4) {
                             _SpineyTree(age: age - 4) {
                                 _SpineyTree(age: age - 4) {
                                     Leaf()
-                                }.rotate(.degrees(22.5))
-                            }.rotate(.degrees(22.5))
-                        }.rotate(.degrees(-22.5))
+                                }.rotate(.degrees(22.5)).scale(0.7)
+                            }.rotate(.degrees(22.5)).scale(0.7)
+                        }.rotate(.degrees(-22.5)).scale(0.7)
                         subtree
                     }
                 }
@@ -51,5 +51,9 @@ struct SpineyTree<Subtree: Tree>: Tree {
                 }
             }
         }
+    }
+    
+    var body: some View {
+        Trunk(diameter: age, shoot: shoot)
     }
 }
