@@ -54,13 +54,13 @@ struct CrossSection {
 }
 
 protocol Tree: Shape {
-    associatedtype Trunk: Tree
-    var trunk: Trunk { get }
+    associatedtype Shoot: Tree
+    var shoot: Shoot { get }
     func draw(in path: inout Path, from crossSection: CrossSection)
 }
 extension Tree {
     func draw(in path: inout Path, from crossSection: CrossSection) {
-        trunk.draw(in: &path, from: crossSection)
+        shoot.draw(in: &path, from: crossSection)
     }
 }
 extension Tree {
@@ -79,17 +79,17 @@ extension Tree {
 }
 
 extension Never: Tree {
-    typealias Trunk = Never
+    typealias Shoot = Never
 }
 
-extension Tree where Trunk == Never {
-    var trunk: Never {
+extension Tree where Shoot == Never {
+    var shoot: Never {
         fatalError("\(Self.self) is a primitive Tree")
     }
 }
 
 struct Leaf: Tree {
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         path.addLine(to: crossSection.midpoint) // FIXME: Is this even useful?
@@ -105,7 +105,7 @@ struct Stem<Subtree: Tree>: Tree {
         self.subtree = subtree()
     }
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         let crossSection = crossSection.extending(by: length)
@@ -128,7 +128,7 @@ private struct Rotate<Subtree: Tree>: Tree {
     let subtree: Subtree
     let angle: Angle
 
-    typealias Trunk = Never
+    typealias Shoot = Never
 
     func draw(in path: inout Path, from crossSection: CrossSection) {
         subtree.draw(in: &path, from: crossSection.rotating(by: angle))
@@ -146,7 +146,7 @@ private struct Scale<Subtree: Tree>: Tree {
     let subtree: Subtree
     let multiplier: CGFloat
 
-    typealias Trunk = Never
+    typealias Shoot = Never
 
     func draw(in path: inout Path, from crossSection: CrossSection) {
         subtree.draw(in: &path, from: crossSection.scaling(by: multiplier))
@@ -163,7 +163,7 @@ extension Tree {
 struct Branch2<T0: Tree, T1: Tree>: Tree {
     var forest: (T0, T1)
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         forest.0.draw(in: &path, from: crossSection)
@@ -176,7 +176,7 @@ struct Branch2<T0: Tree, T1: Tree>: Tree {
 struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
     var forest: (T0, T1, T2)
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         forest.0.draw(in: &path, from: crossSection)
@@ -192,7 +192,7 @@ struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
 struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
     var forest: (T0, T1, T2, T3)
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         forest.0.draw(in: &path, from: crossSection)
@@ -212,7 +212,7 @@ enum ConditionalTree<TrueTree: Tree, FalseTree: Tree>: Tree {
     case trueTree(TrueTree)
     case falseTree(FalseTree)
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         switch self {
@@ -228,7 +228,7 @@ enum OptionalTree<SomeTree: Tree>: Tree {
     case someTree(SomeTree)
     case none
     
-    typealias Trunk = Never
+    typealias Shoot = Never
     
     func draw(in path: inout Path, from crossSection: CrossSection) {
         switch self {
@@ -240,10 +240,10 @@ enum OptionalTree<SomeTree: Tree>: Tree {
     }
 }
 
-struct TreeGroup<Trunk: Tree>: Tree {
-    var trunk: Trunk
+struct TreeGroup<Shoot: Tree>: Tree {
+    var shoot: Shoot
     
-    init(@TreeBuilder _ trunk: () -> Trunk) {
-        self.trunk = trunk()
+    init(@TreeBuilder _ shoot: () -> Shoot) {
+        self.shoot = shoot()
     }
 }

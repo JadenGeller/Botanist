@@ -23,7 +23,7 @@ struct SpineyTree<Subtree: Tree>: Tree {
         self.subtree = subtree()
     }
 
-    var trunk: some Tree {
+    var shoot: some Tree {
         TreeGroup {
             if age > 4 {
                 _SpineyTree(age: age / 2) {

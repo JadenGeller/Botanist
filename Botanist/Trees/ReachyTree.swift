@@ -11,7 +11,7 @@ import SwiftUI
 struct ReachyTree: Tree {
     var age: CGFloat
     
-    var trunk: some Tree {
+    var shoot: some Tree {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.2, scale: 2)) {
             if age > 3 {
                 ReachyTree(age: age - 3)

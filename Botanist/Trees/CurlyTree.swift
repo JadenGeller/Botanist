@@ -11,7 +11,7 @@ import SwiftUI
 struct CurlyTree: Tree {
     var age: CGFloat
     
-    var trunk: some Tree {
+    var shoot: some Tree {
         Stem(age: age, growth: ExponentialGrowth(rate: 1.1, scale: 8)) {
             Stem(age: age, growth: ExponentialGrowth(rate: 1.1, scale: 8)) {
                 if age > 2.5 {
