@@ -14,11 +14,12 @@ extension Angle {
     }
 }
 
-struct CrossSection {
+struct TreeGeometry {
     var midpoint: CGPoint
     var heading: Angle
     var radius: CGFloat
-    
+    var height: CGFloat
+
     var leftPoint: CGPoint {
         CGPoint(
             x: midpoint.x - radius * cos(CGFloat(heading.orthogonal.radians)),
@@ -33,34 +34,35 @@ struct CrossSection {
         )
     }
     
-    func extending(by length: CGFloat) -> CrossSection {
-        CrossSection(
+    func extending(by length: CGFloat) -> TreeGeometry {
+        TreeGeometry(
             midpoint: CGPoint(
                 x: midpoint.x + length * cos(CGFloat(heading.radians)),
                 y: midpoint.y + length * sin(CGFloat(heading.radians))
             ),
             heading: heading,
-            radius: radius
+            radius: radius,
+            height: height + length
         )
     }
     
-    func rotating(by angle: Angle) -> CrossSection {
-        CrossSection(midpoint: midpoint, heading: heading + angle, radius: radius)
+    func rotating(by angle: Angle) -> TreeGeometry {
+        TreeGeometry(midpoint: midpoint, heading: heading + angle, radius: radius, height: height)
     }
     
-    func scaling(by multiplier: CGFloat) -> CrossSection {
-        CrossSection(midpoint: midpoint, heading: heading, radius: radius * multiplier)
+    func scaling(by multiplier: CGFloat) -> TreeGeometry {
+        TreeGeometry(midpoint: midpoint, heading: heading, radius: radius * multiplier,  height: height)
     }
 }
 
 protocol Tree {
     associatedtype Shoot: Tree
     var shoot: Shoot { get } // FIXME: Is subtree a better name?
-    func draw(in path: inout Path, from crossSection: CrossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry)
 }
 extension Tree {
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        shoot.draw(in: &path, from: crossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        shoot.draw(in: &path, from: geometry)
     }
 }
 
@@ -70,14 +72,15 @@ struct Trunk<Shoot: Tree>: Tree, Shape {
 
     public func path(in rect: CGRect) -> Path {
         Path { path in
-            let crossSection = CrossSection(
+            let treeGeometry = TreeGeometry(
                 midpoint: CGPoint(x: rect.midX, y: rect.maxY),
                 heading: .degrees(-90),
-                radius: diameter / 2
+                radius: diameter / 2,
+                height: 0
             )
-            path.move(to: crossSection.leftPoint)
-            draw(in: &path, from: crossSection)
-            path.addLine(to: crossSection.rightPoint)
+            path.move(to: treeGeometry.leftPoint)
+            draw(in: &path, from: treeGeometry)
+            path.addLine(to: treeGeometry.rightPoint)
         }
     }
 }
@@ -95,8 +98,8 @@ extension Tree where Shoot == Never {
 struct Leaf: Tree {
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        path.addLine(to: crossSection.midpoint) // FIXME: Is this even useful?
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        path.addLine(to: geometry.midpoint) // FIXME: Is this even useful?
     }
 }
 
@@ -111,25 +114,25 @@ struct Stem<Subtree: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        let crossSection = crossSection.extending(by: length)
-        path.addLine(to: crossSection.leftPoint)
-        subtree.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        let geometry = geometry.extending(by: length)
+        path.addLine(to: geometry.leftPoint)
+        subtree.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
     }
 }
 
-struct CrossSectionReader<Subtree: Tree>: Tree {
-    var subtree: (CrossSection) -> Subtree
+struct TreeGeometryReader<Subtree: Tree>: Tree {
+    var subtree: (TreeGeometry) -> Subtree
     
-    init(@TreeBuilder subtree: @escaping (CrossSection) -> Subtree) {
+    init(@TreeBuilder subtree: @escaping (TreeGeometry) -> Subtree) {
         self.subtree = subtree
     }
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        subtree(crossSection).draw(in: &path, from: crossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        subtree(geometry).draw(in: &path, from: geometry)
     }
 }
 
@@ -139,8 +142,8 @@ private struct Rotate<Subtree: Tree>: Tree {
 
     typealias Shoot = Never
 
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        subtree.draw(in: &path, from: crossSection.rotating(by: angle))
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        subtree.draw(in: &path, from: geometry.rotating(by: angle))
     }
 }
 
@@ -157,8 +160,8 @@ private struct Scale<Subtree: Tree>: Tree {
 
     typealias Shoot = Never
 
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        subtree.draw(in: &path, from: crossSection.scaling(by: multiplier))
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        subtree.draw(in: &path, from: geometry.scaling(by: multiplier))
     }
 }
 
@@ -174,11 +177,11 @@ struct Branch2<T0: Tree, T1: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        forest.0.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.1.draw(in: &path, from: crossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        forest.0.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.1.draw(in: &path, from: geometry)
     }
 }
 
@@ -187,14 +190,14 @@ struct Branch3<T0: Tree, T1: Tree, T2: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        forest.0.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.1.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.2.draw(in: &path, from: crossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        forest.0.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.1.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.2.draw(in: &path, from: geometry)
     }
 }
 
@@ -203,17 +206,17 @@ struct Branch4<T0: Tree, T1: Tree, T2: Tree, T3: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
-        forest.0.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.1.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.2.draw(in: &path, from: crossSection)
-        path.addLine(to: crossSection.rightPoint)
-        path.addLine(to: crossSection.leftPoint)
-        forest.3.draw(in: &path, from: crossSection)
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
+        forest.0.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.1.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.2.draw(in: &path, from: geometry)
+        path.addLine(to: geometry.rightPoint)
+        path.addLine(to: geometry.leftPoint)
+        forest.3.draw(in: &path, from: geometry)
     }
 }
 
@@ -223,12 +226,12 @@ enum ConditionalTree<TrueTree: Tree, FalseTree: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
         switch self {
         case .trueTree(let tree):
-            tree.draw(in: &path, from: crossSection)
+            tree.draw(in: &path, from: geometry)
         case .falseTree(let tree):
-            tree.draw(in: &path, from: crossSection)
+            tree.draw(in: &path, from: geometry)
         }
     }
 }
@@ -239,10 +242,10 @@ enum OptionalTree<SomeTree: Tree>: Tree {
     
     typealias Shoot = Never
     
-    func draw(in path: inout Path, from crossSection: CrossSection) {
+    func draw(in path: inout Path, from geometry: TreeGeometry) {
         switch self {
         case .someTree(let tree):
-            tree.draw(in: &path, from: crossSection)
+            tree.draw(in: &path, from: geometry)
         case .none:
             break
         }

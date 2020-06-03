@@ -12,9 +12,9 @@ struct WeepyTree: Tree, View {
     var age: CGFloat
     
     var shoot: some Tree {
-        CrossSectionReader { crossSection in
+        TreeGeometryReader { geometry in
             Stem(age: self.age, growth: ExponentialGrowth(rate: 1.1, scale: 8)) {
-                if self.age > 1.4 && crossSection.heading < .degrees(90) + .degrees(Double(self.age)) {
+                if self.age > 1.4 && geometry.heading < .degrees(90) + .degrees(Double(self.age)) {
                     WeepyTree(age: self.age - 1.4)
                         .rotate(.degrees(-10))
                     WeepyTree(age: self.age - 1.4)
