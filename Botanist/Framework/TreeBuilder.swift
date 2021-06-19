@@ -6,7 +6,7 @@
 //  Copyright © 2020 Jaden Geller. All rights reserved.
 //
 
-@_functionBuilder
+@resultBuilder
 struct TreeBuilder {
     static func buildBlock() -> Leaf {
         return Leaf()
